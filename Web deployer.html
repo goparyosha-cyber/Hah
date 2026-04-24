@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fathur APK Fixed</title>
+    <style>
+        /* CSS MURNI - TANPA DEPENDENSI LUAR (ANTI BERANTAKAN) */
+        :root {
+            --bg: #020617;
+            --card: #0f172a;
+            --primary: #6366f1;
+            --text: #f1f5f9;
+            --text-dim: #94a3b8;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: sans-serif;
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        /* Splash Screen */
+        #splash {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #1e293b;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Modal Peraturan */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 100;
+        }
+
+        .modal-card {
+            background: var(--card);
+            padding: 30px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 350px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Sidebar */
+        #sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 280px;
+            background: #000;
+            z-index: 1000;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .side-btn {
+            background: transparent;
+            border: none;
+            color: var(--text);
+            padding: 15px;
+            text-align: left;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 12px;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+
+        .side-btn:active { background: var(--primary); }
+
+        /* Login & Pages */
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-top: 80px;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 60px;
+            background: rgba(2, 6, 23, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 50;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: #1e293b;
+            color: white;
+            font-size: 16px;
+        }
+
+        button.primary {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.39);
+        }
+
+        .hidden { display: none !important; }
+
+        /* Home Style */
+        .profile-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--primary);
+            border-radius: 20px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        /* Chat Section */
+        .chat-box {
+            height: 150px;
+            background: #1e293b;
+            border-radius: 15px;
+            padding: 10px;
+            overflow-y: auto;
+            margin-top: auto;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+
+        .msg {
+            background: rgba(255,255,255,0.05);
+            padding: 8px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Splash Screen -->
+    <div id="splash">
+        <div class="loader"></div>
+        <div style="font-weight: 900; letter-spacing: 5px;">WELCOME</div>
+        <div style="color: var(--primary); font-size: 10px; margin-top: 5px;">FATHUR PLATFORM</div>
+    </div>
+
+    <!-- Modal Rules -->
+    <div id="rules" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h2 style="margin-top: 0;">PERATURAN</h2>
+            <div style="text-align: left; color: var(--text-dim); margin-bottom: 25px;">
+                <p>• Dilarang keras Spam Deploy.</p>
+                <p>• Dilarang Konten Ilegal.</p>
+                <p>• Gunakan dengan Bijak.</p>
+            </div>
+            <button class="primary" onclick="closeRules()">SAYA SETUJU</button>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div id="sidebar">
+        <h2 style="margin-top: 0; color: var(--primary);">FATHUR LABS</h2>
+        <button class="side-btn" onclick="goTo('home')">Dashboard</button>
+        <button class="side-btn" onclick="goTo('deployer')">Web Deployer</button>
+        <button class="side-btn" onclick="goTo('comment')">Comment</button>
+        <button class="side-btn" onclick="goTo('about')">About</button>
+        
+        <div style="margin-top: auto;">
+            <div class="chat-box" id="sideChat">
+                <div class="msg"><b>Admin:</b> Halo Fathur!</div>
+            </div>
+            <div style="display: flex; gap: 5px;">
+                <input type="text" id="chatInput" placeholder="Pesan..." style="margin:0; padding: 10px; border-radius: 8px;">
+                <button onclick="send()" style="background: var(--primary); border:none; border-radius: 8px; color:white; padding: 0 15px;">></button>
+            </div>
+        </div>
+        <button class="side-btn" onclick="location.reload()" style="color: #ef4444; margin-top: 20px;">Keluar</button>
+    </div>
+
+    <!-- Main Header -->
+    <header id="mainHeader" class="hidden">
+        <button onclick="toggleSide()" style="background:none; border:none; color:white; font-size: 24px; cursor: pointer;">☰</button>
+        <div style="margin-left: 15px; font-weight: bold; flex-grow: 1;">FATHUR PRO</div>
+        <div style="width: 35px; height: 35px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold;">F</div>
+    </header>
+
+    <div class="container">
+        <!-- Page Login -->
+        <div id="page-login">
+            <h1 style="text-align: center; margin-bottom: 40px;">LOGIN</h1>
+            <input type="text" id="user" placeholder="Username">
+            <input type="password" id="pass" placeholder="Password">
+            <button class="primary" onclick="login()">MASUK SEKARANG</button>
+        </div>
+
+        <!-- Content Pages -->
+        <div id="all-pages" class="hidden">
+            <!-- Home -->
+            <div id="p-home" style="text-align: center; padding-top: 40px;">
+                <div class="profile-icon">👤</div>
+                <div class="status-badge">ONLINE OWNER</div>
+                <h2 style="margin: 0;">Online Fathur Owner</h2>
+                <p style="color: var(--text-dim); margin-top: 10px;">Sistem aktif dan siap digunakan untuk deployment.</p>
+            </div>
+
+            <!-- Deployer -->
+            <div id="p-deployer" class="hidden">
+                <h3>Web Deployer</h3>
+                <label style="display: block; border: 2px dashed #334155; padding: 40px; text-align: center; border-radius: 20px; margin-bottom: 20px;">
+                    <input type="file" id="fileIn" accept=".html" style="display: none;">
+                    <span id="fileText">Pilih File HTML</span>
+                </label>
+                <button id="upBtn" class="primary" onclick="upload()" disabled style="opacity: 0.5;">TERBITKAN WEB</button>
+                <div id="result" class="hidden" style="margin-top: 20px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px;">
+                    <input id="urlOut" readonly style="margin-bottom: 10px; text-align: center; color: var(--primary);">
+                    <button onclick="copy()" style="background:none; border:none; color:white; width:100%; font-weight: bold; text-decoration: underline;">SALIN LINK</button>
+                </div>
+            </div>
+
+            <!-- Comment -->
+            <div id="p-comment" class="hidden">
+                <h3>Komentar</h3>
+                <div id="fullChat" style="background: var(--card); border-radius: 15px; padding: 15px; min-height: 200px;">
+                    <div class="msg">Belum ada komentar baru.</div>
+                </div>
+            </div>
+
+            <!-- About -->
+            <div id="p-about" class="hidden" style="text-align: center; padding-top: 40px;">
+                <h1 style="font-style: italic; border-bottom: 4px solid var(--primary); display: inline-block;">BY FATHUR</h1>
+                <p style="margin-top: 20px;">Asisten: Gemini AI Pro</p>
+                <button onclick="goTo('home')" style="background:none; border:none; color: var(--primary); font-weight: bold; cursor: pointer;">KEMBALI KE HOME</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Splash logic
+        setTimeout(() => {
+            const splash = document.getElementById('splash');
+            splash.style.opacity = '0';
+            setTimeout(() => {
+                splash.style.display = 'none';
+                document.getElementById('rules').classList.remove('hidden');
+            }, 500);
+        }, 1500);
+
+        function closeRules() { document.getElementById('rules').classList.add('hidden'); }
+
+        function toggleSide() {
+            const side = document.getElementById('sidebar');
+            side.style.transform = side.style.transform === 'translateX(0%)' ? 'translateX(-100%)' : 'translateX(0%)';
+        }
+
+        function login() {
+            const u = document.getElementById('user').value;
+            const p = document.getElementById('pass').value;
+            if(u.toLowerCase() === 'fathur' && p === 'admin123') {
+                document.getElementById('page-login').classList.add('hidden');
+                document.getElementById('mainHeader').classList.remove('hidden');
+                document.getElementById('all-pages').classList.remove('hidden');
+                goTo('home');
+            } else { alert("Login Gagal!"); }
+        }
+
+        function goTo(id) {
+            ['home','deployer','comment','about'].forEach(p => {
+                document.getElementById('p-'+p).classList.add('hidden');
+            });
+            document.getElementById('p-'+id).classList.remove('hidden');
+            const side = document.getElementById('sidebar');
+            if(side.style.transform === 'translateX(0%)') toggleSide();
+        }
+
+        let raw = "";
+        document.getElementById('fileIn').onchange = (e) => {
+            const f = e.target.files[0];
+            const rd = new FileReader();
+            rd.onload = (v) => {
+                raw = v.target.result;
+                document.getElementById('fileText').innerText = f.name;
+                const btn = document.getElementById('upBtn');
+                btn.disabled = false;
+                btn.style.opacity = "1";
+            };
+            rd.readAsText(f);
+        };
+
+        async function upload() {
+            const btn = document.getElementById('upBtn');
+            btn.innerText = "MENGUNGGAH...";
+            try {
+                const res = await fetch('https://codesandbox.io/api/v1/sandboxes/define?json=1', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({files: {'index.html': {content: raw}}})
+                });
+                const d = await res.json();
+                document.getElementById('urlOut').value = `https://${d.sandbox_id}.csb.app`;
+                document.getElementById('result').classList.remove('hidden');
+                btn.innerText = "BERHASIL!";
+            } catch { 
+                btn.innerText = "GAGAL"; 
+                alert("Cek internet anda!");
+            }
+        }
+
+        function copy() {
+            const i = document.getElementById('urlOut'); i.select();
+            document.execCommand('copy'); alert("Tersalin!");
+        }
+
+        function send() {
+            const i = document.getElementById('chatInput');
+            if(!i.value) return;
+            const m = `<div class="msg"><b>Anda:</b> ${i.value}</div>`;
+            document.getElementById('sideChat').innerHTML += m;
+            document.getElementById('fullChat').innerHTML += m;
+            i.value = "";
+        }
+    </script>
+</body>
+</html>
