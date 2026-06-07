@@ -6,7 +6,7 @@ let userData = {
     question: '',
     proof: null
 };
-let adminAuthToken = null; // Stores password for admin sessions
+let adminAuthToken = null;
 
 // Theme Toggle
 const themeToggle = document.getElementById('theme-toggle');
@@ -24,6 +24,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const savedTheme = localStorage.getItem('theme') || 'dark';
     document.documentElement.setAttribute('data-theme', savedTheme);
 });
+
+// Toast Helper
+function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toast-message');
+    const toastIcon = document.getElementById('toast-icon');
+
+    if (!toast) return;
+
+    toast.className = `toast show ${type}`;
+    toastMsg.innerText = message;
+
+    // Set icon based on type
+    if (window.lucide) {
+        const iconName = type === 'success' ? 'check-circle' : 'alert-circle';
+        toastIcon.setAttribute('data-lucide', iconName);
+        lucide.createIcons();
+    }
+
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 4000);
+}
 
 // Navigation Functions
 function scrollToForm() {
@@ -50,6 +73,7 @@ if (tipsForm) {
         userData.name = document.getElementById('full-name').value;
         userData.question = document.getElementById('question').value;
         nextStep(2);
+        showToast('Question details saved!', 'success');
     });
 }
 
@@ -69,8 +93,9 @@ if (proofInput) {
                     type: file.type,
                     name: file.name
                 };
-                fileNameDisplay.innerText = `File selected: ${file.name}`;
+                fileNameDisplay.innerText = `✅ ${file.name} selected`;
                 submitProofBtn.disabled = false;
+                showToast('File uploaded successfully!', 'success');
             };
             reader.readAsDataURL(file);
         }
@@ -80,22 +105,28 @@ if (proofInput) {
 if (submitProofBtn) {
     submitProofBtn.addEventListener('click', () => {
         submitProofBtn.disabled = true;
-        submitProofBtn.innerHTML = '<i data-lucide="loader" class="spin"></i> Submitting...';
+        submitProofBtn.innerHTML = '<i data-lucide="loader" class="spin"></i> Processing...';
         if (window.lucide) lucide.createIcons();
 
         if (typeof google !== 'undefined' && google.script && google.script.run) {
             google.script.run
-                .withSuccessHandler(() => nextStep(3))
+                .withSuccessHandler(() => {
+                    nextStep(3);
+                    showToast('Submission successful!', 'success');
+                })
                 .withFailureHandler((err) => {
-                    alert('Submission failed: ' + err);
+                    showToast('Submission failed: ' + err, 'error');
                     submitProofBtn.disabled = false;
-                    submitProofBtn.innerHTML = 'Submit Payment Proof <i data-lucide="check-circle"></i>';
+                    submitProofBtn.innerHTML = 'Submit & Confirm Payment <i data-lucide="check-circle"></i>';
                     if (window.lucide) lucide.createIcons();
                 })
                 .processSubmission(userData);
         } else {
             // Fallback for local testing
-            setTimeout(() => nextStep(3), 2000);
+            setTimeout(() => {
+                nextStep(3);
+                showToast('Submission successful (Demo Mode)!', 'success');
+            }, 2000);
         }
     });
 }
@@ -103,7 +134,7 @@ if (submitProofBtn) {
 function copyNumber() {
     const num = document.getElementById('dana-number').innerText;
     navigator.clipboard.writeText(num).then(() => {
-        alert('DANA number copied to clipboard!');
+        showToast('DANA number copied!', 'success');
     });
 }
 
@@ -112,7 +143,7 @@ function resetForm() {
     if (fileNameDisplay) fileNameDisplay.innerText = '';
     if (submitProofBtn) {
         submitProofBtn.disabled = true;
-        submitProofBtn.innerHTML = 'Submit Payment Proof <i data-lucide="check-circle"></i>';
+        submitProofBtn.innerHTML = 'Submit & Confirm Payment <i data-lucide="check-circle"></i>';
     }
     nextStep(1);
     if (window.lucide) lucide.createIcons();
@@ -128,20 +159,21 @@ function adminLogin() {
                 if (isValid) {
                     adminAuthToken = pass;
                     document.getElementById('login-overlay').style.display = 'none';
+                    showToast('Admin logged in!', 'success');
                     refreshData();
                 } else {
-                    alert('Invalid Password');
+                    showToast('Invalid Password', 'error');
                 }
             })
             .verifyAdminPassword(pass);
     } else {
-        // Fallback for local testing
         if (pass === 'admin123') {
             adminAuthToken = pass;
             document.getElementById('login-overlay').style.display = 'none';
+            showToast('Admin logged in (Demo Mode)!', 'success');
             refreshData();
         } else {
-            alert('Invalid Password');
+            showToast('Invalid Password', 'error');
         }
     }
 }
@@ -150,13 +182,14 @@ function refreshData() {
     const tbody = document.getElementById('submissions-body');
     if (!tbody) return;
 
-    tbody.innerHTML = '<tr><td colspan="5" class="text-center">Loading submissions...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center"><i data-lucide="loader" class="spin"></i> Loading...</td></tr>';
+    if (window.lucide) lucide.createIcons();
 
     if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run
             .withSuccessHandler((data) => {
                 if (data.error) {
-                    alert(data.error);
+                    showToast(data.error, 'error');
                     document.getElementById('login-overlay').style.display = 'flex';
                 } else {
                     renderSubmissions(data);
@@ -164,10 +197,9 @@ function refreshData() {
             })
             .getDashboardData(adminAuthToken);
     } else {
-        // Mock Data for local demonstration
         const mockData = [
-            { id: 2, name: 'John Doe', question: 'How to invest in crypto?', status: 'Pending Review', proof: '#' },
-            { id: 3, name: 'Alice Smith', question: 'Career advice for developers', status: 'Completed', proof: '#' }
+            { id: 2, name: 'John Doe', question: 'How can I start a SaaS business with no coding skills?', status: 'Pending Review', proof: '#' },
+            { id: 3, name: 'Alice Smith', question: 'Best strategies for scaling a digital marketing agency in 2024?', status: 'Completed', proof: '#' }
         ];
         setTimeout(() => renderSubmissions(mockData), 1000);
     }
@@ -185,16 +217,25 @@ function renderSubmissions(data) {
     data.forEach(item => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td>${item.name}</td>
-            <td title="${item.question}">${item.question.substring(0, 50)}${item.question.length > 50 ? '...' : ''}</td>
-            <td><span class="status-pill status-${item.status.toLowerCase().replace(/\s+/g, '-')}">${item.status}</span></td>
-            <td>${item.proof && item.proof !== '#' ? `<a href="${item.proof}" target="_blank" class="btn-icon"><i data-lucide="image"></i></a>` : '<i data-lucide="image-off"></i>'}</td>
-            <td><button class="btn-primary" onclick="openReply(${item.id}, '${item.name.replace(/'/g, "\\'")}', '${item.status}')">Reply</button></td>
+            <td style="font-weight: 700;">${item.name}</td>
+            <td title="${item.question}">${item.question.substring(0, 60)}${item.question.length > 60 ? '...' : ''}</td>
+            <td><span class="badge pending" style="background: ${getStatusColor(item.status)}15; color: ${getStatusColor(item.status)}; border-color: ${getStatusColor(item.status)}20;">${item.status}</span></td>
+            <td>${item.proof && item.proof !== '#' ? `<a href="${item.proof}" target="_blank" class="btn-icon"><i data-lucide="external-link"></i></a>` : '<i data-lucide="image-off" style="opacity: 0.3;"></i>'}</td>
+            <td><button class="btn-primary" style="padding: 8px 16px; font-size: 0.85rem;" onclick="openReply(${item.id}, '${item.name.replace(/'/g, "\\'")}', '${item.status}')">Manage</button></td>
         `;
         tbody.appendChild(tr);
     });
     if (window.lucide) lucide.createIcons();
     updateStats(data);
+}
+
+function getStatusColor(status) {
+    switch(status) {
+        case 'Completed': return '#10b981';
+        case 'In Progress': return '#6366f1';
+        case 'Pending Review': return '#f59e0b';
+        default: return '#94a3b8';
+    }
 }
 
 function updateStats(data) {
@@ -206,7 +247,7 @@ function updateStats(data) {
 let activeReplyId = null;
 function openReply(id, name, currentStatus) {
     activeReplyId = id;
-    document.getElementById('reply-user').innerText = `Replying to ${name}`;
+    document.getElementById('reply-user').innerText = `Managing Request for ${name}`;
     document.getElementById('update-status').value = currentStatus;
     document.getElementById('reply-modal').style.display = 'flex';
 }
@@ -223,25 +264,23 @@ function submitReply() {
         google.script.run
             .withSuccessHandler((res) => {
                 if (res.success) {
-                    alert('Submission updated successfully.');
+                    showToast('Submission updated!', 'success');
                     closeReply();
                     refreshData();
                 } else {
-                    alert('Error: ' + res.error);
+                    showToast('Error: ' + res.error, 'error');
                 }
             })
             .updateSubmission(adminAuthToken, activeReplyId, status, advice);
     } else {
-        alert(`Local Mode: Status updated to ${status}. Advice: ${advice}`);
+        showToast('Status updated (Demo Mode)!', 'success');
         closeReply();
         refreshData();
     }
 }
 
-// GAS Navigation Helper
 function goToPage(page) {
     if (typeof google !== 'undefined' && google.script && google.script.host) {
-        // Try to get the script URL dynamically
         google.script.run.withSuccessHandler(url => {
            window.open(url + '?p=' + page, '_top');
         }).getScriptUrl();

@@ -4,18 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | ProTips</title>
-    <?!= include('style.css'); ?>
+    <?!= include('style'); ?>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="login-overlay">
         <div class="glass-card" style="max-width: 400px; width: 90%;">
-            <h2 class="text-center" style="margin-bottom: 20px;">Admin Login</h2>
-            <div class="input-group">
-                <label>Password</label>
-                <input type="password" id="admin-pass" placeholder="Enter admin password">
+            <div class="logo" style="justify-content: center; margin-bottom: 32px;">
+                <i data-lucide="zap" class="icon-purple"></i>
+                <span>ProTips Admin</span>
             </div>
-            <button onclick="adminLogin()" class="btn-primary w-full">Access Dashboard</button>
+            <h2 class="text-center" style="margin-bottom: 24px; font-size: 1.5rem;">Access Dashboard</h2>
+            <div class="input-group">
+                <label>Admin Password</label>
+                <input type="password" id="admin-pass" placeholder="••••••••">
+            </div>
+            <button onclick="adminLogin()" class="btn-primary w-full">Sign In <i data-lucide="log-in"></i></button>
         </div>
     </div>
 
@@ -34,49 +41,65 @@
 
     <div class="admin-container">
         <aside>
-            <nav style="display: flex; flex-direction: column; gap: 10px;">
-                <button onclick="refreshData()" class="btn-secondary w-full text-left" style="display: flex; align-items: center; gap: 10px; justify-content: flex-start;">
-                    <i data-lucide="layout-dashboard"></i> Dashboard
+            <nav style="display: flex; flex-direction: column; gap: 12px;">
+                <button onclick="refreshData()" class="btn-secondary w-full text-left" style="display: flex; align-items: center; gap: 12px; justify-content: flex-start; border-color: var(--primary); background: rgba(99, 102, 241, 0.05);">
+                    <i data-lucide="layout-dashboard" size="20"></i> Dashboard
                 </button>
-                <button onclick="refreshData()" class="btn-secondary w-full text-left" style="display: flex; align-items: center; gap: 10px; justify-content: flex-start;">
-                    <i data-lucide="list"></i> Submissions
+                <button onclick="refreshData()" class="btn-secondary w-full text-left" style="display: flex; align-items: center; gap: 12px; justify-content: flex-start;">
+                    <i data-lucide="list" size="20"></i> Submissions
                 </button>
-                <button onclick="goToPage('index')" class="btn-secondary w-full text-left" style="display: flex; align-items: center; gap: 10px; justify-content: flex-start; margin-top: 20px; color: #ef4444;">
-                    <i data-lucide="log-out"></i> Logout
-                </button>
+                <div style="margin-top: auto; padding-top: 40px;">
+                    <button onclick="goToPage('index')" class="btn-secondary w-full text-left" style="display: flex; align-items: center; gap: 12px; justify-content: flex-start; color: var(--error); border-color: rgba(239, 68, 68, 0.2);">
+                        <i data-lucide="log-out" size="20"></i> Sign Out
+                    </button>
+                </div>
             </nav>
         </aside>
 
         <main class="admin-main">
+            <header style="margin-bottom: 40px;">
+                <h1 style="font-size: 2.5rem; font-weight: 900; margin-bottom: 8px;">Dashboard Overview</h1>
+                <p style="color: #64748b;">Manage user submissions and provide expert advice.</p>
+            </header>
+
             <div class="stats-grid">
                 <div class="stat-card">
-                    <p>Total Submissions</p>
+                    <div style="background: rgba(99, 102, 241, 0.1); width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: var(--primary);">
+                        <i data-lucide="message-square"></i>
+                    </div>
+                    <p style="font-weight: 600; color: #64748b; margin-bottom: 8px;">Total Submissions</p>
                     <div class="stat-value" id="total-subs">0</div>
                 </div>
                 <div class="stat-card">
-                    <p>Pending Review</p>
+                    <div style="background: rgba(245, 158, 11, 0.1); width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: var(--pending);">
+                        <i data-lucide="clock"></i>
+                    </div>
+                    <p style="font-weight: 600; color: #64748b; margin-bottom: 8px;">Pending Review</p>
                     <div class="stat-value" id="pending-subs" style="color: var(--pending);">0</div>
                 </div>
                 <div class="stat-card">
-                    <p>Completed</p>
+                    <div style="background: rgba(16, 185, 129, 0.1); width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: var(--success);">
+                        <i data-lucide="check-circle"></i>
+                    </div>
+                    <p style="font-weight: 600; color: #64748b; margin-bottom: 8px;">Completed</p>
                     <div class="stat-value" id="completed-subs" style="color: var(--success);">0</div>
                 </div>
             </div>
 
-            <div class="glass-card" style="padding: 0;">
-                <div style="padding: 20px; display: flex; justify-content: space-between; align-items: center;">
-                    <h3>Recent Submissions</h3>
-                    <button class="btn-icon" onclick="refreshData()"><i data-lucide="refresh-cw"></i></button>
+            <div class="glass-card" style="padding: 0; overflow: hidden; border-radius: 24px;">
+                <div style="padding: 24px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.01);">
+                    <h3 style="font-size: 1.25rem; font-weight: 800;">Recent Submissions</h3>
+                    <button class="btn-icon" onclick="refreshData()" title="Refresh Data"><i data-lucide="refresh-cw"></i></button>
                 </div>
                 <div style="overflow-x: auto;">
                     <table class="submissions-table">
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Question</th>
+                                <th>User Name</th>
+                                <th>Question Details</th>
                                 <th>Status</th>
                                 <th>Proof</th>
-                                <th>Action</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="submissions-body">
@@ -89,30 +112,43 @@
     </div>
 
     <!-- Modal for Reply -->
-    <div id="reply-modal" style="display:none; position: fixed; inset:0; background: rgba(0,0,0,0.8); z-index: 3000; align-items: center; justify-content: center; padding: 20px;">
-        <div class="glass-card" style="max-width: 600px; width: 100%;">
-            <h3>Reply to Submission</h3>
-            <p id="reply-user" style="margin-bottom: 20px; color: #94a3b8;"></p>
+    <div id="reply-modal" style="display:none; position: fixed; inset:0; background: rgba(0,0,0,0.85); z-index: 3000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(8px);">
+        <div class="glass-card" style="max-width: 650px; width: 100%; border-radius: 32px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+                <h3 style="font-size: 1.75rem; font-weight: 900;">Manage Request</h3>
+                <button onclick="closeReply()" class="btn-icon" style="border-radius: 50%;"><i data-lucide="x"></i></button>
+            </div>
+
+            <div style="background: rgba(99, 102, 241, 0.05); padding: 20px; border-radius: 20px; border: 1px solid var(--border); margin-bottom: 32px;">
+                <p id="reply-user" style="font-weight: 800; color: var(--primary); margin-bottom: 4px;"></p>
+                <p style="font-size: 0.9rem; color: #64748b;">Update status and provide expert advice below.</p>
+            </div>
+
             <div class="input-group">
-                <label>Status</label>
-                <select id="update-status" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg); color: var(--text); border: 1px solid var(--border);">
+                <label>Update Status</label>
+                <select id="update-status">
                     <option value="Pending Review">Pending Review</option>
                     <option value="In Progress">In Progress</option>
                     <option value="Completed">Completed</option>
                 </select>
             </div>
             <div class="input-group">
-                <label>Your Advice</label>
-                <textarea id="reply-text" rows="5" placeholder="Write your tips here..."></textarea>
+                <label>Your Expert Advice</label>
+                <textarea id="reply-text" rows="6" placeholder="Type your personalized tips and advice here..."></textarea>
             </div>
             <div class="btn-group">
-                <button onclick="closeReply()" class="btn-secondary">Cancel</button>
-                <button onclick="submitReply()" class="btn-primary">Send Advice</button>
+                <button onclick="closeReply()" class="btn-secondary w-full">Cancel</button>
+                <button onclick="submitReply()" class="btn-primary w-full">Send Advice <i data-lucide="send"></i></button>
             </div>
         </div>
     </div>
 
-    <?!= include('script.js'); ?>
+    <div id="toast" class="toast">
+        <i id="toast-icon"></i>
+        <span id="toast-message"></span>
+    </div>
+
+    <?!= include('script'); ?>
     <script>
         if (window.lucide) lucide.createIcons();
     </script>

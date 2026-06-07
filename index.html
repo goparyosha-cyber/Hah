@@ -4,14 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ProTips | Expert Advice & Paid Tips</title>
-    <?!= include('style.css'); ?>
+    <?!= include('style'); ?>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div class="bg-glow">
+        <div class="glow-1"></div>
+        <div class="glow-2"></div>
+    </div>
+
     <nav class="glass-nav">
         <div class="container nav-content">
-            <div class="logo">
+            <div class="logo" onclick="window.location.reload()">
                 <i data-lucide="zap" class="icon-purple"></i>
                 <span>ProTips</span>
             </div>
@@ -27,100 +35,118 @@
     <main class="container">
         <!-- Hero Section -->
         <section id="hero" class="hero-section">
-            <h1 class="gradient-text">Expert Advice at Your Fingertips</h1>
-            <p class="subtitle">Get professional tips and personalized advice from industry experts. Simple, fast, and secure.</p>
-            <button onclick="scrollToForm()" class="btn-primary">Get Started <i data-lucide="chevron-right"></i></button>
+            <span class="hero-badge">🚀 Trusted by 10,000+ Users</span>
+            <h1 class="gradient-text">Expert Advice<br>at Your Fingertips</h1>
+            <p class="subtitle">Get professional tips and personalized advice from industry experts. Simple, fast, and secure. We help you make better decisions.</p>
+            <button onclick="scrollToForm()" class="btn-primary">Get Expert Advice <i data-lucide="sparkles"></i></button>
         </section>
 
         <!-- Form Section -->
         <section id="form-section" class="glass-card">
             <div id="step-1" class="form-step active">
-                <h2><i data-lucide="message-square"></i> Your Question</h2>
-                <p>Fill in your details and what you'd like to ask.</p>
+                <h2><i data-lucide="message-circle" class="icon-purple"></i> Your Question</h2>
+                <p>Fill in your details and what you'd like to ask our experts.</p>
                 <form id="tips-form">
                     <div class="input-group">
                         <label for="full-name">Full Name</label>
-                        <input type="text" id="full-name" placeholder="John Doe" required>
+                        <input type="text" id="full-name" placeholder="Enter your full name" required>
                     </div>
                     <div class="input-group">
                         <label for="question">Your Question/Request</label>
-                        <textarea id="question" rows="5" placeholder="Describe your situation or what you need advice on..." required></textarea>
+                        <textarea id="question" rows="5" placeholder="Describe your situation or what you need advice on in detail..." required></textarea>
                     </div>
-                    <button type="submit" class="btn-primary w-full">Proceed to Payment <i data-lucide="credit-card"></i></button>
+                    <button type="submit" class="btn-primary w-full">Proceed to Secure Payment <i data-lucide="arrow-right"></i></button>
                 </form>
             </div>
 
             <!-- Payment Step -->
             <div id="step-2" class="form-step">
-                <h2><i data-lucide="wallet"></i> Payment</h2>
-                <p>Please complete the payment via DANA to proceed.</p>
+                <h2><i data-lucide="wallet" class="icon-purple"></i> Payment Details</h2>
+                <p>Please complete the payment via DANA to proceed with your request.</p>
 
                 <div class="payment-info">
-                    <div class="dana-logo">
-                        <span class="dana-text" style="font-size: 2rem; font-weight: 800; color: #0081c0;">DANA</span>
-                    </div>
+                    <div class="dana-logo-text">DANA</div>
                     <div class="payment-details">
-                        <p>Number: <strong id="dana-number">0812-3456-7890</strong> <button class="btn-copy" onclick="copyNumber()"><i data-lucide="copy"></i></button></p>
-                        <p>Amount: <strong>IDR 50,000</strong></p>
+                        <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 8px;">DANA NUMBER</p>
+                        <p><strong id="dana-number">0812-3456-7890</strong> <button class="btn-copy" onclick="copyNumber()" title="Copy Number"><i data-lucide="copy" size="18"></i></button></p>
+                        <div style="height: 24px;"></div>
+                        <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 8px;">TOTAL AMOUNT</p>
+                        <p><strong style="font-size: 1.5rem; color: var(--primary);">IDR 50,000</strong></p>
                     </div>
                     <div class="qris-placeholder">
-                        <i data-lucide="qr-code" size="100"></i>
-                        <p>Scan QRIS Code</p>
+                        <i data-lucide="qr-code" size="120"></i>
+                        <p style="font-weight: 700; margin-top: 10px; font-size: 0.8rem;">SCAN QRIS CODE</p>
                     </div>
                 </div>
 
                 <div class="proof-upload">
                     <label for="payment-proof" class="custom-file-upload">
-                        <i data-lucide="upload-cloud"></i>
-                        <span>Upload Payment Proof</span>
+                        <i data-lucide="upload-cloud" size="48"></i>
+                        <span style="font-weight: 700;">Upload Payment Proof</span>
+                        <span style="font-size: 0.8rem; color: #94a3b8;">Click to browse files (JPG, PNG)</span>
                         <input type="file" id="payment-proof" accept="image/*">
                     </label>
                     <div id="file-name-display"></div>
                 </div>
 
                 <div class="btn-group">
-                    <button onclick="prevStep(1)" class="btn-secondary">Back</button>
-                    <button id="submit-proof" class="btn-primary" disabled>Submit Payment Proof <i data-lucide="check-circle"></i></button>
+                    <button onclick="prevStep(1)" class="btn-secondary">Go Back</button>
+                    <button id="submit-proof" class="btn-primary w-full" disabled>Submit & Confirm Payment <i data-lucide="check-circle"></i></button>
                 </div>
             </div>
 
             <!-- Success Step -->
             <div id="step-3" class="form-step text-center">
                 <div class="success-icon">
-                    <i data-lucide="check-circle-2" size="64" class="icon-success"></i>
+                    <i data-lucide="check-circle-2" size="80" class="icon-success"></i>
                 </div>
-                <h2>Submission Received!</h2>
-                <p>Your request is now <span class="badge pending">Pending Review</span>.</p>
-                <p>We will review your payment and question shortly. You will receive your advice soon!</p>
-                <button onclick="resetForm()" class="btn-secondary">Submit Another Question</button>
+                <h2 style="font-size: 2.5rem; margin-bottom: 16px;">Success!</h2>
+                <p style="font-size: 1.25rem;">Your request is now <span class="badge pending">Pending Review</span>.</p>
+                <div style="max-width: 500px; margin: 0 auto; background: rgba(16, 185, 129, 0.05); padding: 24px; border-radius: 20px; border: 1px solid rgba(16, 185, 129, 0.1);">
+                    <p style="color: var(--text); margin-bottom: 0;">Our experts are reviewing your payment and question. You will receive your personalized advice via the provided contact info within 24 hours.</p>
+                </div>
+                <button onclick="resetForm()" class="btn-primary" style="margin-top: 40px;">Submit Another Question</button>
             </div>
         </section>
 
         <!-- Features Section -->
         <section class="features">
             <div class="feature-card">
-                <i data-lucide="shield-check"></i>
-                <h3>Secure Payment</h3>
-                <p>Your transactions are safe with manual verification.</p>
+                <i data-lucide="shield-check" size="32"></i>
+                <h3>Secure Verification</h3>
+                <p>Every transaction is manually verified by our team to ensure highest security standards.</p>
             </div>
             <div class="feature-card">
-                <i data-lucide="clock"></i>
-                <h3>Fast Response</h3>
-                <p>Receive your tips and advice within 24 hours.</p>
+                <i data-lucide="zap" size="32"></i>
+                <h3>Rapid Response</h3>
+                <p>Get your expert advice delivered within 24 hours. Most requests are handled in under 6h.</p>
             </div>
             <div class="feature-card">
-                <i data-lucide="user-check"></i>
-                <h3>Expert Insight</h3>
-                <p>Personalized advice tailored to your specific needs.</p>
+                <i data-lucide="user-check" size="32"></i>
+                <h3>Verified Experts</h3>
+                <p>Access a network of industry professionals with years of experience in their fields.</p>
             </div>
         </section>
     </main>
 
+    <div id="toast" class="toast">
+        <i id="toast-icon"></i>
+        <span id="toast-message"></span>
+    </div>
+
+    <?!= include('script'); ?>
+
     <footer>
-        <p>&copy; 2024 ProTips Service. All rights reserved.</p>
+        <div class="container">
+            <div class="logo" style="justify-content: center; margin-bottom: 20px;">
+                <i data-lucide="zap" class="icon-purple"></i>
+                <span>ProTips</span>
+            </div>
+            <p>&copy; 2024 ProTips Service. All rights reserved.</p>
+            <p style="font-size: 0.8rem; margin-top: 10px; color: #64748b;">The #1 platform for personalized professional advice.</p>
+        </div>
     </footer>
 
-    <?!= include('script.js'); ?>
     <script>
         // Initialize Lucide icons
         if (window.lucide) lucide.createIcons();

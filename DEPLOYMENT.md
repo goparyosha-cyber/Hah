@@ -18,10 +18,10 @@ This project is designed to be deployed as a **Google Apps Script Web App**. Fol
     -   `Code.gs` (Script)
     -   `index.html` (HTML)
     -   `admin.html` (HTML)
-    -   `style.css.html` (HTML)
-    -   `script.js.html` (HTML)
+    -   `style` (HTML file - paste content of `style.html`)
+    -   `script` (HTML file - paste content of `script.html`)
 
-    *Note: In GAS, all frontend files (CSS/JS) must be created as HTML files.*
+    *Note: In GAS, you create files by name without extensions. The `include()` function in `Code.gs` looks for files named 'style' and 'script'.*
 
 ## 3. Deployment
 1.  Click the **Deploy** button > **New Deployment**.
@@ -33,7 +33,7 @@ This project is designed to be deployed as a **Google Apps Script Web App**. Fol
 7.  Copy the **Web App URL**.
 
 ## 4. Finalizing
-1.  Open `script.js.html`.
+1.  Open the `script` HTML file.
 2.  Find the `goToPage` function at the bottom.
 3.  Replace `YOUR_SCRIPT_ID` (if manually building URLs) or rely on the dynamic `getScriptUrl` implementation already provided.
 

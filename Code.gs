@@ -22,9 +22,7 @@ function doGet(e) {
 }
 
 function include(filename) {
-  // filename will be like 'style.css' or 'script.js'
-  // In GAS, these are stored as 'style.css.html' and 'script.js.html'
-  return HtmlService.createHtmlOutputFromFile(filename + '.html').getContent();
+  return HtmlService.createHtmlOutputFromFile(filename).getContent();
 }
 
 function getScriptUrl() {
