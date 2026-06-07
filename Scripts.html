@@ -1,0 +1,186 @@
+<script>
+  // State Management
+  const state = {
+    user: null,
+    theme: 'dark',
+    activePage: 'home'
+  };
+
+  // Initial Load
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const splash = document.getElementById('splash');
+      if (splash) {
+        splash.style.opacity = '0';
+        setTimeout(() => {
+          splash.style.display = 'none';
+          document.getElementById('rules').classList.remove('hidden');
+        }, 500);
+      }
+    }, 1500);
+
+    // Load existing comments
+    loadComments();
+  });
+
+  function closeRules() {
+    document.getElementById('rules').classList.add('hidden');
+  }
+
+  function toggleSide() {
+    const side = document.getElementById('sidebar');
+    const isOpen = side.style.transform === 'translateX(0%)';
+    side.style.transform = isOpen ? 'translateX(-100%)' : 'translateX(0%)';
+  }
+
+  function login() {
+    const user = document.getElementById('user').value;
+    const pass = document.getElementById('pass').value;
+
+    google.script.run
+      .withSuccessHandler((isValid) => {
+        if (isValid) {
+          state.user = user;
+          document.getElementById('page-login').classList.add('hidden');
+          document.getElementById('mainHeader').classList.remove('hidden');
+          document.getElementById('all-pages').classList.remove('hidden');
+          goTo('home');
+        } else {
+          alert("Login Gagal! Username atau Password salah.");
+        }
+      })
+      .checkLogin(user, pass);
+  }
+
+  function goTo(pageId) {
+    const pages = ['home', 'deployer', 'comment', 'about'];
+    pages.forEach(p => {
+      const el = document.getElementById('p-' + p);
+      if (el) el.classList.add('hidden');
+
+      const btn = document.querySelector(`.side-btn[onclick*="${p}"]`);
+      if (btn) btn.classList.remove('active');
+    });
+
+    const activeEl = document.getElementById('p-' + pageId);
+    if (activeEl) activeEl.classList.remove('hidden');
+
+    const activeBtn = document.querySelector(`.side-btn[onclick*="${pageId}"]`);
+    if (activeBtn) activeBtn.classList.add('active');
+
+    state.activePage = pageId;
+
+    const side = document.getElementById('sidebar');
+    if (side.style.transform === 'translateX(0%)') toggleSide();
+  }
+
+  // File Upload Logic
+  let selectedFile = null;
+  function handleFileSelect(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    selectedFile = file;
+    document.getElementById('fileText').innerText = file.name;
+    const btn = document.getElementById('upBtn');
+    btn.disabled = false;
+    btn.style.opacity = "1";
+  }
+
+  function upload() {
+    if (!selectedFile) return;
+
+    const btn = document.getElementById('upBtn');
+    btn.innerText = "MENGUNGGAH...";
+    btn.disabled = true;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const base64Data = e.target.result;
+      const pass = document.getElementById('deployPass').value;
+
+      if (!pass) {
+        alert("Masukkan password admin!");
+        btn.innerText = "TERBITKAN KE DRIVE";
+        btn.disabled = false;
+        return;
+      }
+
+      google.script.run
+        .withSuccessHandler((url) => {
+          if (url.startsWith("Error")) {
+            alert(url);
+            btn.innerText = "GAGAL";
+            btn.disabled = false;
+          } else {
+            document.getElementById('urlOut').value = url;
+            document.getElementById('result').classList.remove('hidden');
+            btn.innerText = "BERHASIL!";
+          }
+        })
+        .uploadFile(base64Data, selectedFile.name, pass);
+    };
+    reader.readAsDataURL(selectedFile);
+  }
+
+  async function copyLink() {
+    const i = document.getElementById('urlOut');
+    try {
+      await navigator.clipboard.writeText(i.value);
+      alert("Link Drive tersalin ke clipboard!");
+    } catch (err) {
+      // Fallback
+      i.select();
+      document.execCommand('copy');
+      alert("Link Drive tersalin!");
+    }
+  }
+
+  // Comment logic
+  function loadComments() {
+    google.script.run
+      .withSuccessHandler((comments) => {
+        if (comments && comments.length > 0) {
+          document.getElementById('fullChat').innerHTML = "";
+          comments.forEach(c => {
+            appendComment(c.user, c.text);
+          });
+        }
+      })
+      .getComments();
+  }
+
+  function sendComment() {
+    const input = document.getElementById('chatInput');
+    const msg = input.value.trim();
+    if (!msg || !state.user) {
+        if(!state.user) alert("Harap login terlebih dahulu.");
+        return;
+    }
+
+    google.script.run
+      .withSuccessHandler((success) => {
+        if (success) {
+          appendComment("Anda", msg);
+          input.value = "";
+        }
+      })
+      .addComment(state.user, msg);
+  }
+
+  function appendComment(user, text) {
+    const div = document.createElement('div');
+    div.className = 'comment-bubble';
+
+    const userEl = document.createElement('b');
+    userEl.textContent = user + ': ';
+
+    const textEl = document.createTextNode(text);
+
+    div.appendChild(userEl);
+    div.appendChild(textEl);
+
+    document.getElementById('sideChat').appendChild(div.cloneNode(true));
+    document.getElementById('fullChat').appendChild(div);
+  }
+</script>
