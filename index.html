@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProTips | Expert Advice & Paid Tips</title>
+    <?!= include('style.css'); ?>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <nav class="glass-nav">
+        <div class="container nav-content">
+            <div class="logo">
+                <i data-lucide="zap" class="icon-purple"></i>
+                <span>ProTips</span>
+            </div>
+            <div class="nav-actions">
+                <button id="theme-toggle" class="btn-icon" aria-label="Toggle Theme">
+                    <i data-lucide="sun" class="sun-icon"></i>
+                    <i data-lucide="moon" class="moon-icon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <!-- Hero Section -->
+        <section id="hero" class="hero-section">
+            <h1 class="gradient-text">Expert Advice at Your Fingertips</h1>
+            <p class="subtitle">Get professional tips and personalized advice from industry experts. Simple, fast, and secure.</p>
+            <button onclick="scrollToForm()" class="btn-primary">Get Started <i data-lucide="chevron-right"></i></button>
+        </section>
+
+        <!-- Form Section -->
+        <section id="form-section" class="glass-card">
+            <div id="step-1" class="form-step active">
+                <h2><i data-lucide="message-square"></i> Your Question</h2>
+                <p>Fill in your details and what you'd like to ask.</p>
+                <form id="tips-form">
+                    <div class="input-group">
+                        <label for="full-name">Full Name</label>
+                        <input type="text" id="full-name" placeholder="John Doe" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="question">Your Question/Request</label>
+                        <textarea id="question" rows="5" placeholder="Describe your situation or what you need advice on..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary w-full">Proceed to Payment <i data-lucide="credit-card"></i></button>
+                </form>
+            </div>
+
+            <!-- Payment Step -->
+            <div id="step-2" class="form-step">
+                <h2><i data-lucide="wallet"></i> Payment</h2>
+                <p>Please complete the payment via DANA to proceed.</p>
+
+                <div class="payment-info">
+                    <div class="dana-logo">
+                        <span class="dana-text" style="font-size: 2rem; font-weight: 800; color: #0081c0;">DANA</span>
+                    </div>
+                    <div class="payment-details">
+                        <p>Number: <strong id="dana-number">0812-3456-7890</strong> <button class="btn-copy" onclick="copyNumber()"><i data-lucide="copy"></i></button></p>
+                        <p>Amount: <strong>IDR 50,000</strong></p>
+                    </div>
+                    <div class="qris-placeholder">
+                        <i data-lucide="qr-code" size="100"></i>
+                        <p>Scan QRIS Code</p>
+                    </div>
+                </div>
+
+                <div class="proof-upload">
+                    <label for="payment-proof" class="custom-file-upload">
+                        <i data-lucide="upload-cloud"></i>
+                        <span>Upload Payment Proof</span>
+                        <input type="file" id="payment-proof" accept="image/*">
+                    </label>
+                    <div id="file-name-display"></div>
+                </div>
+
+                <div class="btn-group">
+                    <button onclick="prevStep(1)" class="btn-secondary">Back</button>
+                    <button id="submit-proof" class="btn-primary" disabled>Submit Payment Proof <i data-lucide="check-circle"></i></button>
+                </div>
+            </div>
+
+            <!-- Success Step -->
+            <div id="step-3" class="form-step text-center">
+                <div class="success-icon">
+                    <i data-lucide="check-circle-2" size="64" class="icon-success"></i>
+                </div>
+                <h2>Submission Received!</h2>
+                <p>Your request is now <span class="badge pending">Pending Review</span>.</p>
+                <p>We will review your payment and question shortly. You will receive your advice soon!</p>
+                <button onclick="resetForm()" class="btn-secondary">Submit Another Question</button>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features">
+            <div class="feature-card">
+                <i data-lucide="shield-check"></i>
+                <h3>Secure Payment</h3>
+                <p>Your transactions are safe with manual verification.</p>
+            </div>
+            <div class="feature-card">
+                <i data-lucide="clock"></i>
+                <h3>Fast Response</h3>
+                <p>Receive your tips and advice within 24 hours.</p>
+            </div>
+            <div class="feature-card">
+                <i data-lucide="user-check"></i>
+                <h3>Expert Insight</h3>
+                <p>Personalized advice tailored to your specific needs.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 ProTips Service. All rights reserved.</p>
+    </footer>
+
+    <?!= include('script.js'); ?>
+    <script>
+        // Initialize Lucide icons
+        if (window.lucide) lucide.createIcons();
+    </script>
+</body>
+</html>
