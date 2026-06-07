@@ -1,0 +1,252 @@
+<script>
+// State Management
+let currentStep = 1;
+let userData = {
+    name: '',
+    question: '',
+    proof: null
+};
+let adminAuthToken = null; // Stores password for admin sessions
+
+// Theme Toggle
+const themeToggle = document.getElementById('theme-toggle');
+if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+    });
+}
+
+// Load Theme from LocalStorage
+document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+});
+
+// Navigation Functions
+function scrollToForm() {
+    const formSection = document.getElementById('form-section');
+    if (formSection) formSection.scrollIntoView({ behavior: 'smooth' });
+}
+
+function nextStep(step) {
+    document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
+    const targetStep = document.getElementById(`step-${step}`);
+    if (targetStep) targetStep.classList.add('active');
+    currentStep = step;
+}
+
+function prevStep(step) {
+    nextStep(step);
+}
+
+// Step 1: Form Submission
+const tipsForm = document.getElementById('tips-form');
+if (tipsForm) {
+    tipsForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        userData.name = document.getElementById('full-name').value;
+        userData.question = document.getElementById('question').value;
+        nextStep(2);
+    });
+}
+
+// Step 2: Payment Proof Handling
+const proofInput = document.getElementById('payment-proof');
+const submitProofBtn = document.getElementById('submit-proof');
+const fileNameDisplay = document.getElementById('file-name-display');
+
+if (proofInput) {
+    proofInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                userData.proof = {
+                    data: event.target.result.split(',')[1],
+                    type: file.type,
+                    name: file.name
+                };
+                fileNameDisplay.innerText = `File selected: ${file.name}`;
+                submitProofBtn.disabled = false;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+}
+
+if (submitProofBtn) {
+    submitProofBtn.addEventListener('click', () => {
+        submitProofBtn.disabled = true;
+        submitProofBtn.innerHTML = '<i data-lucide="loader" class="spin"></i> Submitting...';
+        if (window.lucide) lucide.createIcons();
+
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+            google.script.run
+                .withSuccessHandler(() => nextStep(3))
+                .withFailureHandler((err) => {
+                    alert('Submission failed: ' + err);
+                    submitProofBtn.disabled = false;
+                    submitProofBtn.innerHTML = 'Submit Payment Proof <i data-lucide="check-circle"></i>';
+                    if (window.lucide) lucide.createIcons();
+                })
+                .processSubmission(userData);
+        } else {
+            // Fallback for local testing
+            setTimeout(() => nextStep(3), 2000);
+        }
+    });
+}
+
+function copyNumber() {
+    const num = document.getElementById('dana-number').innerText;
+    navigator.clipboard.writeText(num).then(() => {
+        alert('DANA number copied to clipboard!');
+    });
+}
+
+function resetForm() {
+    if (tipsForm) tipsForm.reset();
+    if (fileNameDisplay) fileNameDisplay.innerText = '';
+    if (submitProofBtn) {
+        submitProofBtn.disabled = true;
+        submitProofBtn.innerHTML = 'Submit Payment Proof <i data-lucide="check-circle"></i>';
+    }
+    nextStep(1);
+    if (window.lucide) lucide.createIcons();
+}
+
+// Admin Logic
+function adminLogin() {
+    const pass = document.getElementById('admin-pass').value;
+
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+            .withSuccessHandler((isValid) => {
+                if (isValid) {
+                    adminAuthToken = pass;
+                    document.getElementById('login-overlay').style.display = 'none';
+                    refreshData();
+                } else {
+                    alert('Invalid Password');
+                }
+            })
+            .verifyAdminPassword(pass);
+    } else {
+        // Fallback for local testing
+        if (pass === 'admin123') {
+            adminAuthToken = pass;
+            document.getElementById('login-overlay').style.display = 'none';
+            refreshData();
+        } else {
+            alert('Invalid Password');
+        }
+    }
+}
+
+function refreshData() {
+    const tbody = document.getElementById('submissions-body');
+    if (!tbody) return;
+
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center">Loading submissions...</td></tr>';
+
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+            .withSuccessHandler((data) => {
+                if (data.error) {
+                    alert(data.error);
+                    document.getElementById('login-overlay').style.display = 'flex';
+                } else {
+                    renderSubmissions(data);
+                }
+            })
+            .getDashboardData(adminAuthToken);
+    } else {
+        // Mock Data for local demonstration
+        const mockData = [
+            { id: 2, name: 'John Doe', question: 'How to invest in crypto?', status: 'Pending Review', proof: '#' },
+            { id: 3, name: 'Alice Smith', question: 'Career advice for developers', status: 'Completed', proof: '#' }
+        ];
+        setTimeout(() => renderSubmissions(mockData), 1000);
+    }
+}
+
+function renderSubmissions(data) {
+    const tbody = document.getElementById('submissions-body');
+    tbody.innerHTML = '';
+
+    if (!data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center">No submissions found.</td></tr>';
+        return;
+    }
+
+    data.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${item.name}</td>
+            <td title="${item.question}">${item.question.substring(0, 50)}${item.question.length > 50 ? '...' : ''}</td>
+            <td><span class="status-pill status-${item.status.toLowerCase().replace(/\s+/g, '-')}">${item.status}</span></td>
+            <td>${item.proof && item.proof !== '#' ? `<a href="${item.proof}" target="_blank" class="btn-icon"><i data-lucide="image"></i></a>` : '<i data-lucide="image-off"></i>'}</td>
+            <td><button class="btn-primary" onclick="openReply(${item.id}, '${item.name.replace(/'/g, "\\'")}', '${item.status}')">Reply</button></td>
+        `;
+        tbody.appendChild(tr);
+    });
+    if (window.lucide) lucide.createIcons();
+    updateStats(data);
+}
+
+function updateStats(data) {
+    document.getElementById('total-subs').innerText = data.length;
+    document.getElementById('pending-subs').innerText = data.filter(i => i.status === 'Pending Review').length;
+    document.getElementById('completed-subs').innerText = data.filter(i => i.status === 'Completed').length;
+}
+
+let activeReplyId = null;
+function openReply(id, name, currentStatus) {
+    activeReplyId = id;
+    document.getElementById('reply-user').innerText = `Replying to ${name}`;
+    document.getElementById('update-status').value = currentStatus;
+    document.getElementById('reply-modal').style.display = 'flex';
+}
+
+function closeReply() {
+    document.getElementById('reply-modal').style.display = 'none';
+}
+
+function submitReply() {
+    const status = document.getElementById('update-status').value;
+    const advice = document.getElementById('reply-text').value;
+
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+            .withSuccessHandler((res) => {
+                if (res.success) {
+                    alert('Submission updated successfully.');
+                    closeReply();
+                    refreshData();
+                } else {
+                    alert('Error: ' + res.error);
+                }
+            })
+            .updateSubmission(adminAuthToken, activeReplyId, status, advice);
+    } else {
+        alert(`Local Mode: Status updated to ${status}. Advice: ${advice}`);
+        closeReply();
+        refreshData();
+    }
+}
+
+// GAS Navigation Helper
+function goToPage(page) {
+    if (typeof google !== 'undefined' && google.script && google.script.host) {
+        // Try to get the script URL dynamically
+        google.script.run.withSuccessHandler(url => {
+           window.open(url + '?p=' + page, '_top');
+        }).getScriptUrl();
+    } else {
+        window.location.href = page + '.html';
+    }
+}
+</script>
